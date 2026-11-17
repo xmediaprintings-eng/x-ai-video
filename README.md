@@ -37,12 +37,17 @@
 - ดูที่อยู่ในหน้าต่างดำ เช่น `On your phone : http://192.168.1.25:8000` แล้วพิมพ์ในเบราว์เซอร์มือถือ
 - ถ้า Windows ถามเรื่อง Firewall ให้กด **Allow** (Private network)
 
-### ติดตั้งเป็นแอปบน iPhone (ไอคอนบนหน้าจอโฮม)
-โปรแกรมทำงานอยู่บนคอมพิวเตอร์ ส่วน iPhone ใช้เป็นรีโมตสำหรับอัปโหลดคลิปและสั่งงาน
-1. เปิด `start.bat` บนคอมพิวเตอร์ แล้วดูที่อยู่ `On your phone : http://192.168.x.x:8000`
-2. ต่อ iPhone กับ Wi-Fi เดียวกัน → เปิด **Safari** → พิมพ์ที่อยู่นั้น
-3. กด **Share (□↑)** → **Add to Home Screen** → **Add** → จะได้ไอคอน **X AI Video**
-4. บันทึกวิดีโอลง Photos: กด **⬇ ດາວໂຫຼດ MP4** → กด Share → **Save Video**
+### แอป iPhone (ติดตั้งด้วย Sideloadly)
+แอป **X AI Video** เป็นรีโมตบน iPhone ส่วนการตัดต่อทำบนคอมพิวเตอร์
+1. ดาวน์โหลด **XAIVideo.ipa** จากหน้า [Releases](../../releases/latest) (GitHub Actions build ให้อัตโนมัติทุกครั้งที่แก้โฟลเดอร์ `ios/`)
+2. เปิด **Sideloadly** บน Windows → เสียบ iPhone → ลาก `XAIVideo.ipa` ใส่ → ใส่ Apple ID → **Start**
+3. บน iPhone: Settings → General → VPN & Device Management → กด Trust Apple ID ของคุณ
+4. เปิด `start.bat` บนคอมพิวเตอร์ → เปิดแอป X AI Video → กด **🔍 ຄົ້ນຫາອັດຕະໂນມັດ** (หรือพิมพ์ที่อยู่ `192.168.x.x:8000`) → เมื่อ iPhone ถามสิทธิ์ **Local Network** ให้กด Allow
+5. ตัดต่อเสร็จ กด **⬇ ບັນທຶກລົງ Photos** → วิดีโอจะถูกบันทึกลง Photos ทันที
+
+ถ้าใช้ Apple ID ฟรี แอปจะหมดอายุทุก 7 วัน ให้ Sideloadly ติดตั้งใหม่ (หรือเปิด auto-refresh)
+
+**ไม่อยากติดตั้งแอป:** เปิด Safari → `http://192.168.x.x:8000` → Share → **Add to Home Screen**
 
 คลิป HDR จาก iPhone (ค่าเริ่มต้นของกล้อง) จะถูกแปลงสีเป็น SDR ให้อัตโนมัติ สีจึงไม่ซีด รูป HEIC ก็ใช้ได้
 
