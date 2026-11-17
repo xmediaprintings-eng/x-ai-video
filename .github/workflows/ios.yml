@@ -1,0 +1,65 @@
+name: Build iPhone app (IPA for Sideloadly)
+
+on:
+  push:
+    branches: [main]
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+
+      - name: Build (unsigned)
+        working-directory: ios
+        run: |
+          set -o pipefail
+          xcodebuild -project XAIVideo.xcodeproj -target XAIVideo -configuration Release -sdk iphoneos \
+            SYMROOT="$PWD/build" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build > build.log 2>&1 || true
+          grep -E "error:|BUILD (SUCCEEDED|FAILED)" build.log | head -40 || true
+          test -d build/Release-iphoneos/XAIVideo.app
+
+      - name: Report build errors
+        if: failure()
+        working-directory: ios
+        run: |
+          grep -E "error:" build.log | sort -u | head -25 | while IFS= read -r line; do
+            echo "::error::${line//$'\n'/ }"
+          done
+          tail -40 build.log
+
+      - name: Package IPA
+        working-directory: ios
+        run: |
+          rm -rf Payload && mkdir Payload
+          cp -R build/Release-iphoneos/XAIVideo.app Payload/
+          zip -qry XAIVideo.ipa Payload
+          ls -la XAIVideo.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: XAIVideo-ipa
+          path: ios/XAIVideo.ipa
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="ios-${{ github.run_number }}"
+          gh release create "$TAG" ios/XAIVideo.ipa \
+            --title "X AI Video – iPhone app (build ${{ github.run_number }})" \
+            --notes "ດາວໂຫຼດ XAIVideo.ipa ແລ້ວຕິດຕັ້ງດ້ວຍ Sideloadly. Download XAIVideo.ipa and install it with Sideloadly." \
+            --latest

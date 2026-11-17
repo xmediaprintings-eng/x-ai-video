@@ -256,6 +256,12 @@ $("btnSaveSettings").onclick = async () => {
   } catch (e) { toast(e.message, true); }
 };
 
+// ---------------------------------------------------------------- iPhone app (X AI Video)
+if (window.XAV_IOS) {
+  $("btnDownload").textContent = "⬇ ບັນທຶກລົງ Photos";
+  $("btnChangeServer").onclick = () => window.webkit?.messageHandlers?.xav?.postMessage("changeServer");
+}
+
 // ---------------------------------------------------------------- boot
 loadStatus();
 loadRecent();
