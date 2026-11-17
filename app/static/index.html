@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
 <title>X Media AI Video</title>
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/static/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="X AI Video">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Noto+Sans+Lao:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/style.css">
@@ -102,7 +109,7 @@
       <h2><span class="step">3</span>ວິດີໂອຂອງທ່ານ <small>Your video</small></h2>
       <video id="video" controls playsinline></video>
       <div class="actions">
-        <a id="btnDownload" class="primary" download>⬇ ດາວໂຫຼດ MP4</a>
+        <a id="btnDownload" class="primary" download target="_blank" rel="noopener">⬇ ດາວໂຫຼດ MP4</a>
         <button id="btnNew" class="ghost">＋ ວິດີໂອໃໝ່</button>
       </div>
       <div id="versions" class="versions"></div>

@@ -63,7 +63,8 @@ def _fps(rate: str | None) -> float:
 
 
 def probe(path: str | Path) -> dict:
-    info = {"duration": 0.0, "width": 0, "height": 0, "fps": 30.0, "has_audio": False, "has_video": False}
+    info = {"duration": 0.0, "width": 0, "height": 0, "fps": 30.0, "has_audio": False, "has_video": False,
+            "transfer": ""}
     if FFPROBE:
         r = run([FFPROBE, "-v", "error", "-print_format", "json", "-show_format", "-show_streams", str(path)], check=False)
         try:
@@ -88,7 +89,7 @@ def probe(path: str | Path) -> dict:
                             pass
                 if abs(rot) % 180 == 90:
                     w, h = h, w
-                info.update(width=w, height=h, has_video=True)
+                info.update(width=w, height=h, has_video=True, transfer=s.get("color_transfer") or "")
                 f = _fps(s.get("avg_frame_rate")) or _fps(s.get("r_frame_rate"))
                 if 1 <= f <= 240:
                     info["fps"] = f
@@ -114,7 +115,23 @@ def probe(path: str | Path) -> dict:
         if m and abs(int(float(m[1]))) % 180 == 90:
             info["width"], info["height"] = info["height"], info["width"]
         info["has_audio"] = "Audio:" in err
+        m = re.search(r"(arib-std-b67|smpte2084)", err)
+        if m:
+            info["transfer"] = m[1]
     return info
+
+
+HDR_TRANSFERS = ("arib-std-b67", "smpte2084")  # HLG (iPhone default) / PQ
+
+
+def _has_filter(name: str) -> bool:
+    if not FFMPEG:
+        return False
+    r = run([FFMPEG, "-hide_banner", "-filters"], check=False)
+    return re.search(rf"\s{name}\s", r.stdout or "") is not None
+
+
+HAS_TONEMAP = _has_filter("zscale") and _has_filter("tonemap")
 
 
 def orientation(w: int, h: int) -> str:

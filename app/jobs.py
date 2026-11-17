@@ -151,7 +151,7 @@ def _analyze(jid: str) -> list[dict]:
                 continue
             clip = {"id": cid, "name": up["name"], "kind": "video", "path": str(path),
                     "duration": round(info["duration"], 3), "width": info["width"], "height": info["height"],
-                    "fps": info["fps"], "has_audio": info["has_audio"]}
+                    "fps": info["fps"], "has_audio": info["has_audio"], "transfer": info.get("transfer", "")}
             clip["scenes"] = media.detect_scenes(path, info["duration"])
             clip["frames"] = []
             for t in media.sample_times(clip["scenes"], budget):

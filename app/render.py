@@ -14,7 +14,7 @@ from typing import Callable
 from PIL import Image, ImageDraw, ImageFont
 
 from . import config
-from .media import FFMPEG, MediaError, run
+from .media import FFMPEG, HAS_TONEMAP, HDR_TRANSFERS, MediaError, run
 from .textlayout import AssBuilder
 
 ASPECTS = {"9:16": (1080, 1920), "1:1": (1080, 1080), "4:5": (1080, 1350), "16:9": (1920, 1080)}
@@ -75,8 +75,13 @@ def render_segment(clip: dict, seg: dict, dur: float, W: int, H: int, fps: int, 
         sp = seg.get("speed", 1.0)
         zf = 1.12 if seg.get("effect") == "punch_in" else 1.0
         zw, zh = int(W * zf) // 2 * 2, int(H * zf) // 2 * 2
+        tm = ""
+        trc = clip.get("transfer", "")
+        if trc in HDR_TRANSFERS and HAS_TONEMAP:  # iPhone HDR (HLG/Dolby Vision) -> normal SDR colours
+            tm = (f"zscale=tin={trc}:min=bt2020nc:pin=bt2020:rin=tv:t=linear:npl=100,format=gbrpf32le,"
+                  f"zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,")
         vf = (f"setpts=(PTS-STARTPTS)/{sp},scale={zw}:{zh}:force_original_aspect_ratio=increase:flags=lanczos,"
-              f"crop={W}:{H},fps={fps},setsar=1,format=yuv420p,tpad=stop_mode=clone:stop_duration=1")
+              f"crop={W}:{H},{tm}fps={fps},setsar=1,format=yuv420p,tpad=stop_mode=clone:stop_duration=1")
         has_audio = clip.get("has_audio") and not seg.get("mute") and orig_vol > 0
     args += ["-f", "lavfi", "-t", f"{dur + 0.5:.3f}", "-i", "anullsrc=r=48000:cl=stereo"]
     fc = f"[0:v]{vf}[v]"
