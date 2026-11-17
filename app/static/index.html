@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<title>X Media AI Video</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Noto+Sans+Lao:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="xbox">X</div>
+    <div>
+      <div class="name">X Media <span class="hl">AI Video</span></div>
+      <div class="sub">ຕັດຕໍ່ວິດີໂອດ້ວຍ AI · AI video editor</div>
+    </div>
+  </div>
+  <button class="icon" id="btnSettings" title="Settings">⚙</button>
+</header>
+
+<main>
+  <div id="statusPill" class="pill">…</div>
+
+  <!-- NEW JOB -->
+  <section id="newJob">
+    <div class="card">
+      <h2><span class="step">1</span>ອັບໂຫຼດຄລິບ ຫຼື ຮູບ <small>Upload clips / photos</small></h2>
+      <label class="drop" id="drop">
+        <input type="file" id="files" accept="video/*,image/*" multiple>
+        <span class="big">＋</span>
+        <span>ແຕະເພື່ອເລືອກວິດີໂອ / ຮູບ (ຫຼາຍໄຟລ໌ໄດ້)</span>
+        <small>MP4 · MOV · JPG · PNG</small>
+      </label>
+      <div id="fileList" class="files"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="step">2</span>ບອກ AI ວ່າຢາກໄດ້ແບບໃດ <small>Tell the AI</small></h2>
+      <textarea id="instruction" rows="4" placeholder="ເຊັ່ນ: ເຮັດວິດີໂອໂຄສະນາກ່ອງໄຟ 20 ວິນາທີ ສຳລັບ Reels, ເປີດດ້ວຍປ້າຍໄຟຕອນກາງຄືນ, ມີຂໍ້ຄວາມ 'ຮັບເຮັດປ້າຍໄຟ LED'"></textarea>
+      <div class="chips" id="chips"></div>
+
+      <div class="row">
+        <div class="field">
+          <label>ຂະໜາດ <small>Size</small></label>
+          <div class="seg" id="aspect">
+            <button data-v="9:16" class="on">9:16<small>Reels</small></button>
+            <button data-v="4:5">4:5<small>Feed</small></button>
+            <button data-v="1:1">1:1<small>Post</small></button>
+            <button data-v="16:9">16:9<small>YouTube</small></button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>ຄວາມຍາວ <small>Length</small> <b class="mono" id="durVal">20</b> ວິ</label>
+          <input type="range" id="duration" min="6" max="90" step="1" value="20">
+        </div>
+      </div>
+      <div class="row two">
+        <label class="toggle"><input type="checkbox" id="captions"><span></span>ຄຳບັນຍາຍອັດຕະໂນມັດ<small>Auto captions</small></label>
+        <div class="field">
+          <label>ພາສາສຽງເວົ້າ <small>Speech</small></label>
+          <select id="language">
+            <option value="auto">ອັດຕະໂນມັດ Auto</option>
+            <option value="lo">ລາວ</option>
+            <option value="th">ไทย</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+      <div class="row two">
+        <div class="field">
+          <label>ເພງປະກອບ <small>Music (optional)</small></label>
+          <input type="file" id="music" accept="audio/*">
+        </div>
+        <div class="field">
+          <label>ຄຸນນະພາບ <small>Quality</small></label>
+          <select id="quality">
+            <option value="1080">1080p</option>
+            <option value="720">720p (ໄວກວ່າ)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button class="ai-btn" id="btnCreate">✨ ສ້າງວິດີໂອດ້ວຍ AI</button>
+  </section>
+
+  <!-- PROGRESS -->
+  <section id="progressBox" class="card hidden">
+    <h2 id="progMsg">…</h2>
+    <div class="bar"><div id="progBar"></div></div>
+    <div id="progDetail" class="muted mono"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="hidden">
+    <div class="card">
+      <h2><span class="step">3</span>ວິດີໂອຂອງທ່ານ <small>Your video</small></h2>
+      <video id="video" controls playsinline></video>
+      <div class="actions">
+        <a id="btnDownload" class="primary" download>⬇ ດາວໂຫຼດ MP4</a>
+        <button id="btnNew" class="ghost">＋ ວິດີໂອໃໝ່</button>
+      </div>
+      <div id="versions" class="versions"></div>
+      <div id="summary" class="summary"></div>
+      <div id="warnings" class="warn hidden"></div>
+      <h3>ລຳດັບຊອດ <small>Shots</small></h3>
+      <div id="timeline" class="timeline"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="step">4</span>ແກ້ໄຂດ້ວຍການພິມ <small>Revise by chat</small></h2>
+      <div id="chat" class="chat"></div>
+      <div class="chatbox">
+        <textarea id="reviseText" rows="2" placeholder="ເຊັ່ນ: ເອົາຊອດປ້າຍໄຟຕອນກາງຄືນມາໄວ້ທຳອິດ, ຕົວໜັງສືໃຫຍ່ຂຶ້ນ, ສັ້ນລົງເຫຼືອ 15 ວິ"></textarea>
+        <button class="ai-btn small" id="btnRevise">ແກ້ໄຂ</button>
+      </div>
+      <details>
+        <summary>ແຜນການຕັດຕໍ່ (JSON) — ແກ້ເອງ <small>Edit plan</small></summary>
+        <textarea id="planJson" rows="14" class="mono"></textarea>
+        <button class="ghost" id="btnRenderJson">▶ Render ຈາກ JSON</button>
+      </details>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>ວຽກຫຼ້າສຸດ <small>Recent</small></h2>
+    <div id="recent" class="recent"></div>
+  </section>
+</main>
+
+<!-- SETTINGS -->
+<div id="settings" class="modal hidden">
+  <div class="sheet">
+    <h2>ຕັ້ງຄ່າ <small>Settings</small></h2>
+    <div class="field"><label>Claude API key</label>
+      <input id="sApiKey" type="password" placeholder="sk-ant-..." autocomplete="off">
+      <small class="muted">ຮັບໄດ້ທີ່ console.anthropic.com → API Keys</small></div>
+    <div class="field"><label>ໂມເດວ AI <small>Model</small></label><select id="sModel"></select></div>
+    <div class="field"><label>ຊື່ຮ້ານ <small>Shop name</small></label><input id="sShop"></div>
+    <div class="field"><label>ບໍລິການ <small>Tagline</small></label><input id="sTagline"></div>
+    <div class="field"><label>ເບີໂທ (ແຖວລະເບີ) <small>Phones</small></label><textarea id="sPhones" rows="3"></textarea></div>
+    <div class="field"><label>ທີ່ຢູ່ <small>Address</small></label><input id="sAddress"></div>
+    <div class="field"><label>ໂລໂກ້ (PNG ພື້ນໃສ) <small>Logo</small></label>
+      <div class="logo-row"><img id="sLogoPreview" alt=""><input id="sLogo" type="file" accept="image/png,image/jpeg,image/webp"></div></div>
+    <div class="field"><label>Whisper model <small>(ຄຳບັນຍາຍ)</small></label>
+      <select id="sWhisper"><option>small</option><option>medium</option><option>large-v3</option><option>base</option></select></div>
+    <div class="actions">
+      <button class="primary" id="btnSaveSettings">ບັນທຶກ Save</button>
+      <button class="ghost" id="btnCloseSettings">ປິດ Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

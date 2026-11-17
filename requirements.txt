@@ -1,0 +1,8 @@
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+anthropic>=0.40
+pillow>=10.0
+pillow-heif>=0.16
+# Optional, installed separately by start.bat (auto captions from speech):
+# faster-whisper>=1.0
